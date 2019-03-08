@@ -5,6 +5,11 @@
  */
 package practica01_client;
 
+import java.io.File;
+import javafx.stage.FileChooser;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
  *
  * @author iAngelMx
@@ -30,7 +35,7 @@ public class AppClient extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
+        pathFile = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -42,8 +47,13 @@ public class AppClient extends javax.swing.JFrame {
         jLabel2.setText("Selecciona el archivo que deseas enviar...");
 
         jButton1.setText("Selecciona archivo");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
 
-        jLabel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        pathFile.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jButton2.setText("Enviar ! :D");
 
@@ -54,7 +64,7 @@ public class AppClient extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pathFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -73,7 +83,7 @@ public class AppClient extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pathFile, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                 .addContainerGap())
@@ -81,6 +91,36 @@ public class AppClient extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+
+        //Creamos el objeto JFileChooser
+        JFileChooser chooser=new JFileChooser();
+
+        //Indicamos lo que podemos seleccionar
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        //Creamos el filtro
+        //FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.TXT", "txt");
+
+        //Le indicamos el filtro
+        //chooser.setFileFilter(filtro);
+        
+        chooser.setMultiSelectionEnabled(true);
+        chooser.showOpenDialog(null);
+
+        File[] files = chooser.getSelectedFiles();
+        //Si el usuario, pincha en aceptar
+        if(seleccion==JFileChooser.APPROVE_OPTION){
+
+            //Seleccionamos el fichero
+            File fichero=fc.getSelectedFile();
+
+            //Ecribe la ruta del fichero seleccionado en el campo de texto
+            pathFile.setText(fichero.getAbsolutePath());
+
+        }
+    }//GEN-LAST:event_jButton1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -122,6 +162,6 @@ public class AppClient extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel pathFile;
     // End of variables declaration//GEN-END:variables
 }
