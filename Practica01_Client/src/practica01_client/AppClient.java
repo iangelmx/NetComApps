@@ -110,16 +110,15 @@ public class AppClient extends javax.swing.JFrame {
         chooser.showOpenDialog(null);
 
         File[] files = chooser.getSelectedFiles();
-        //Si el usuario, pincha en aceptar
-        if(seleccion==JFileChooser.APPROVE_OPTION){
-
-            //Seleccionamos el fichero
-            File fichero=fc.getSelectedFile();
-
-            //Ecribe la ruta del fichero seleccionado en el campo de texto
-            pathFile.setText(fichero.getAbsolutePath());
-
+        
+        String str = "";
+        
+        for( File archivo : files ){
+            str+= archivo.getAbsolutePath();
         }
+        
+        pathFile.setText(str);
+        
     }//GEN-LAST:event_jButton1MouseClicked
 
     /**
