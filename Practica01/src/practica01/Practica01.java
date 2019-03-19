@@ -16,15 +16,17 @@ import java.net.Socket;
 public class Practica01 {
     public static void main(String[] args) throws IOException {
         Socket socket = null;
-        String host = "192.168.43.244";
+        String host = "10.100.73.11";
 
         socket = new Socket(host, 5555);
 
-        File file = new File("C:\\Users\\iAngelMx\\Documents\\GitHub\\filezilla.exe");
+        File file1 = new File("C:\\Users\\iAngelMx\\Desktop\\VALLARTA\\archivo.txt");
+        
+        File file2 = new File("C:\\Users\\iAngelMx\\Desktop\\VALLARTA\\fff.txt");
         // Get the size of the file
-        long length = file.length();
+        long length = file1.length();
         byte[] bytes = new byte[32 * 1024];
-        InputStream in = new FileInputStream(file);
+        InputStream in = new FileInputStream(file1);
         OutputStream out = socket.getOutputStream();
 
         int count;
@@ -37,6 +39,18 @@ public class Practica01 {
 
         out.close();
         in.close();
+        InputStream in2 = new FileInputStream(file2);
+        OutputStream out2 = socket.getOutputStream();
+        int count2;
+        int a2 = 0;
+        while ((count2 = in.read(bytes)) > 0) {
+            a++;
+            out.write(bytes, 0, count2);
+            System.out.println("Cuenta Cli:"+count2+" lin: "+a2);
+        }
+
+        out2.close();
+        in2.close();
         socket.close();
     }
 }

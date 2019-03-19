@@ -6,6 +6,13 @@
 package practica01_client;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import javafx.stage.FileChooser;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -35,8 +42,11 @@ public class AppClient extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        pathFile = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pathFile = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
+        buffer = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -53,9 +63,24 @@ public class AppClient extends javax.swing.JFrame {
             }
         });
 
-        pathFile.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
         jButton2.setText("Enviar ! :D");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        pathFile.setColumns(20);
+        pathFile.setRows(5);
+        jScrollPane1.setViewportView(pathFile);
+
+        jLabel3.setText("Tamaño de buffer:");
+
+        buffer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bufferActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -64,13 +89,21 @@ public class AppClient extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pathFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(buffer))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -82,16 +115,47 @@ public class AppClient extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pathFile, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(buffer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void enviaInfo(String path) throws IOException{
+        Socket socket = null;
+        String host = "10.100.73.11";
+
+        socket = new Socket(host, 5555);
+
+        File file = new File(path);
+        // Get the size of the file
+        long length = file.length();
+        byte[] bytes = new byte[32 * 1024];
+        InputStream in = new FileInputStream(file);
+        OutputStream out = socket.getOutputStream();
+
+        int count;
+        int a = 0;
+        while ((count = in.read(bytes)) > 0) {
+            a++;
+            out.write(bytes, 0, count);
+            System.out.println("Cuenta Cli:"+count+" lin: "+a);
+        }
+        out.close();
+        in.close();
+    }
+    
+    File[] files;
+    
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
 
         //Creamos el objeto JFileChooser
@@ -109,17 +173,64 @@ public class AppClient extends javax.swing.JFrame {
         chooser.setMultiSelectionEnabled(true);
         chooser.showOpenDialog(null);
 
-        File[] files = chooser.getSelectedFiles();
+        files = chooser.getSelectedFiles();
         
         String str = "";
+        int nArchivos = files.length;
         
+        String detalles = "";
         for( File archivo : files ){
-            str+= archivo.getAbsolutePath();
+            
+            String name = archivo.getName();
+            String ext = name.substring(name.lastIndexOf("."));
+            String tam = String.valueOf(archivo.length());
+            
+            str+= "Archivo: "+name+"\n";
+            str+= "Extens.: "+ext+"\n";
+            str+= "Tamanio: "+tam+" bytes\n";
+            str+= "----------------\n";
+            detalles += name+"|"+ext+"|"+tam+"\n";
         }
         
-        pathFile.setText(str);
+        String ruta = "C:\\Users\\iAngelMx\\Desktop\\archivo.txt";
+        File archivo = new File(ruta);
+        try{
+            FileWriter fw = new FileWriter(archivo);
         
+            PrintWriter escribir;
+            if(archivo.exists()) {
+                escribir = new PrintWriter(fw);
+                escribir.write(detalles);
+            } else {
+                escribir = new PrintWriter(fw);
+                escribir.write(detalles);
+            }
+            escribir.close();
+            enviaInfo("C:\\Users\\iAngelMx\\Desktop\\archivo.txt");
+          }
+        catch(Exception ex){}
+        
+        
+        
+        pathFile.setText(str);
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void bufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bufferActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bufferActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String str = "", detalles="";
+        
+        for( File archivo : files ){
+            String path = archivo.getPath();
+            try{
+                enviaInfo(path);
+            }
+            catch(Exception ex){}
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -157,10 +268,13 @@ public class AppClient extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField buffer;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel pathFile;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea pathFile;
     // End of variables declaration//GEN-END:variables
 }
