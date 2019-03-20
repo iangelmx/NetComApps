@@ -102,10 +102,20 @@ public class Practica01_Server {
 
                         int count;
                         int i=0;
+                        double porcentaje=0;
+                        double peso=0;
+                        
                         while ((count = in.read(bytes)) > 0) {
-                            out.write(bytes, 0, count);
+                            peso+=count;
+                            System.out.println(Double.valueOf(files.get(contador).get(2))+"-"+peso);
+                                    
+                                    
+                            porcentaje=(peso/Integer.valueOf(files.get(contador).get(2)))*100;
+                            System.out.println("linea "+i+". Cuenta servidor: "+porcentaje+"%");
                             i++;
-                            System.out.println("linea "+i+". Cuenta servidor: "+count);
+                            out.write(bytes, 0, count);
+                            
+                            
                         }
                         contador++;
                         out.close();
