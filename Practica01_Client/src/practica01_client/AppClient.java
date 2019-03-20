@@ -155,7 +155,7 @@ public class AppClient extends javax.swing.JFrame {
         String host = "10.100.65.34";
 
 
-        socket = new Socket(host, 5555);
+        socket = new Socket(host, 3060);
 
         File file = new File(path);
         // Get the size of the file

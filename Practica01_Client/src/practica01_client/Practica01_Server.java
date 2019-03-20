@@ -40,7 +40,7 @@ public class Practica01_Server {
         int contador=0;
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(5555);
+            serverSocket = new ServerSocket(3060);
             System.out.println("server is running");
         } catch (IOException ex) {
             System.out.println("Can't setup server on this port number. ");
