@@ -152,7 +152,7 @@ public class AppClient extends javax.swing.JFrame {
         }
         Socket socket = null;
 
-        String host = "192.168.0.9";
+        String host = "10.100.65.34";
 
 
         socket = new Socket(host, 5555);
@@ -172,8 +172,9 @@ public class AppClient extends javax.swing.JFrame {
             a++;
             acum += count;
             out.write(bytes, 0, count);
-            System.out.println("Cuenta Cli:"+count+" lin: "+a);
+            //System.out.println("Cuenta Cli:"+count+" lin: "+a);
             progresoEnvio = (100 * acum) / length;
+            System.out.println("Progreso: "+progresoEnvio);
             progreso.setText(String.valueOf(progresoEnvio));
         }
         out.close();
