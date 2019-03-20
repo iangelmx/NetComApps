@@ -132,7 +132,7 @@ public class AppClient extends javax.swing.JFrame {
 
     public void enviaInfo(String path) throws IOException{
         Socket socket = null;
-        String host = "10.100.73.11";
+        String host = "192.168.0.9";
 
         socket = new Socket(host, 5555);
 
@@ -192,7 +192,7 @@ public class AppClient extends javax.swing.JFrame {
             detalles += name+"|"+ext+"|"+tam+"\n";
         }
         
-        String ruta = "C:\\Users\\iAngelMx\\Desktop\\archivo.txt";
+        String ruta = "src\\uploads\\archivo.txt";
         File archivo = new File(ruta);
         try{
             FileWriter fw = new FileWriter(archivo);
@@ -206,7 +206,7 @@ public class AppClient extends javax.swing.JFrame {
                 escribir.write(detalles);
             }
             escribir.close();
-            enviaInfo("C:\\Users\\iAngelMx\\Desktop\\archivo.txt");
+            enviaInfo("src\\uploads\\archivo.txt");
           }
         catch(Exception ex){}
         
