@@ -28,6 +28,7 @@ public class AppClient extends javax.swing.JFrame {
      */
     public AppClient() {
         initComponents();
+        btnEnviar.setEnabled(false);
     }
 
     /**
@@ -42,11 +43,13 @@ public class AppClient extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnEnviar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         pathFile = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
         buffer = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        progreso = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -63,10 +66,10 @@ public class AppClient extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("Enviar ! :D");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnEnviar.setText("Enviar ! :D");
+        btnEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnEnviarActionPerformed(evt);
             }
         });
 
@@ -81,6 +84,10 @@ public class AppClient extends javax.swing.JFrame {
                 bufferActionPerformed(evt);
             }
         });
+
+        jLabel4.setText("Progreso:");
+
+        progreso.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -98,11 +105,13 @@ public class AppClient extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnEnviar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(buffer))
+                                    .addComponent(buffer)
+                                    .addComponent(jLabel4)
+                                    .addComponent(progreso, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
@@ -122,33 +131,50 @@ public class AppClient extends javax.swing.JFrame {
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buffer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(progreso, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEnviar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void enviaInfo(String path) throws IOException{
+    public void enviaInfo(String path, int tamBuffer) throws IOException{
+        int var = 0;
+        if (tamBuffer == 0){
+            var = 16;
+        }else{
+            var = tamBuffer;
+        }
         Socket socket = null;
+
         String host = "192.168.0.9";
+
 
         socket = new Socket(host, 5555);
 
         File file = new File(path);
         // Get the size of the file
         long length = file.length();
-        byte[] bytes = new byte[32 * 1024];
+        byte[] bytes = new byte[var * 1024];
         InputStream in = new FileInputStream(file);
         OutputStream out = socket.getOutputStream();
 
         int count;
         int a = 0;
+        double progresoEnvio = 0;
+        long acum = 0;
         while ((count = in.read(bytes)) > 0) {
             a++;
+            acum += count;
             out.write(bytes, 0, count);
             System.out.println("Cuenta Cli:"+count+" lin: "+a);
+            progresoEnvio = (100 * acum) / length;
+            progreso.setText(String.valueOf(progresoEnvio));
         }
         out.close();
         in.close();
@@ -191,8 +217,12 @@ public class AppClient extends javax.swing.JFrame {
             str+= "----------------\n";
             detalles += name+"|"+ext+"|"+tam+"\n";
         }
+
         
         String ruta = "src\\uploads\\archivo.txt";
+
+        btnEnviar.setEnabled(true);
+        
         File archivo = new File(ruta);
         try{
             FileWriter fw = new FileWriter(archivo);
@@ -206,9 +236,11 @@ public class AppClient extends javax.swing.JFrame {
                 escribir.write(detalles);
             }
             escribir.close();
-            enviaInfo("src\\uploads\\archivo.txt");
+            enviaInfo("src\\uploads\\archivo.txt",0);
+
           }
-        catch(Exception ex){}
+        catch(Exception ex){
+        System.out.println(ex);}
         
         
         
@@ -219,18 +251,21 @@ public class AppClient extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_bufferActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
+        
+        int tamBuf = Integer.parseInt(buffer.getText());
         String str = "", detalles="";
         
         for( File archivo : files ){
             String path = archivo.getPath();
             try{
-                enviaInfo(path);
+                enviaInfo(path, tamBuf);
             }
-            catch(Exception ex){}
+            catch(Exception ex){
+            System.out.println(ex);}
         }
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnEnviarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -268,13 +303,15 @@ public class AppClient extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEnviar;
     private javax.swing.JTextField buffer;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea pathFile;
+    private javax.swing.JLabel progreso;
     // End of variables declaration//GEN-END:variables
 }
