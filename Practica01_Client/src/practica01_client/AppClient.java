@@ -152,7 +152,7 @@ public class AppClient extends javax.swing.JFrame {
         }
         Socket socket = null;
 
-        String host = "192.168.0.9";
+        String host = "10.100.65.34";
 
 
         socket = new Socket(host, 5555);
