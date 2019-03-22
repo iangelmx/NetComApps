@@ -12,6 +12,7 @@ public class Cliente {
         FileWriter fw = new FileWriter(file);
         PrintWriter escribir = null;
         escribir = new PrintWriter(fw);
+        escribir.write(toWrite);
         escribir.close();
         return file;
     }
