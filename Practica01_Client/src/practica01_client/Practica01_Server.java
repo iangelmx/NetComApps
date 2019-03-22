@@ -98,7 +98,7 @@ public class Practica01_Server {
                         } catch (FileNotFoundException ex) {
                         System.out.println("File not found. ");
                         }
-                         byte[] bytes = new byte[32*1024];
+                         byte[] bytes = new byte[1000*1024];
 
                         int count;
                         int i=0;
@@ -111,7 +111,8 @@ public class Practica01_Server {
                                     
                                     
                             porcentaje=(peso/Integer.valueOf(files.get(contador).get(2)))*100;
-                            System.out.println("linea "+i+". Cuenta servidor: "+porcentaje+"%");
+                            System.out.println("linea "+i+".\n"+
+                                    files.get(contador).get(0)+ " Cuenta servidor: "+porcentaje+"%");
                             i++;
                             out.write(bytes, 0, count);
                             
