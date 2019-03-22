@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package serializacion;
 
+import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,14 +11,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import serializacion.Persona;
 
-/**
- *
- * @author neyer
- */
 public class servidor {
+    
+        
     public static void run_servidor() throws IOException{
     ServerSocket serverSocket = null;
+    Persona per1=null;
+    Gson gson=new Gson();
         try {
             serverSocket = new ServerSocket(3060);
             System.out.println("servidor corriendo");
@@ -68,7 +65,9 @@ public class servidor {
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
                 String line;
                 while ((line = br.readLine()) != null) {
+                    per1= gson.fromJson(line,persona.class);
                    System.out.println(line);
+                   System.out.println(per1.toString());
                 }
                
 		
