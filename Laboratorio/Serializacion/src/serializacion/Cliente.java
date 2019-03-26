@@ -32,7 +32,7 @@ public class Cliente {
             System.out.println("Conection failed: "+ ex);
         }
         
-        File file = writeToFile("src\\objetos\\serialized.json", datos);
+        File file = writeToFile("src\\objetos\\CtoS.json", datos);
         
         long length = file.length();
         byte[] bytes = new byte[buffer * 1024];
