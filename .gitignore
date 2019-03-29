@@ -26,3 +26,6 @@ hs_err_pid*
 /Practica01_Client/build/
 /PRACTICA02_CarritoCompra/nbproject/private/
 /PRACTICA02_CarritoCompra/build/
+/Laboratorio/ServidorClienteUDP/nbproject/private/
+/Laboratorio/ServidorClienteUDP/build/
+/Laboratorio/ServidorClienteUDP/dist/
