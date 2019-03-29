@@ -88,13 +88,8 @@ public class Servidor {
             new Item("2CD", "Chocolate", 1, 5)
         };
         
-        Gson gson= new Gson();
         String serializado = gson.toJson(invent);
-        
-        System.out.println(invent);
-        System.out.println(serializado);
-
-        sendFileToServer(serializado, "localhost", 3060, 10);
+       
         
         ServerSocket serverSocket = null;
         Gson gson=new Gson();
@@ -104,36 +99,60 @@ public class Servidor {
         } catch (IOException ex) {
             System.out.println("Error: "+ex);
         }
-
+        
         Socket socket = null;
         InputStream in = null;
         OutputStream out = null;
-        try {
+        
+        while(true){
+            try {
             socket = serverSocket.accept();
-            /*
-            Aquí se crearía el nuevo socket
-            */
-        } catch (IOException ex) {
-            System.out.println("No se pudo aceptar conexión: "+ex);
-        }
-        try {
-            in = socket.getInputStream();
-        } catch (IOException ex) {
-            System.out.println("Error con socket In: " +ex);
-        }
-        try {
-            out = new FileOutputStream("src\\objetos\\recieved.json");
-        } catch (FileNotFoundException ex) {
-            System.out.println("File not found. ");
-        }
-        byte[] bytes = new byte[buffer*1024];
-        int count;
-        int i=0;
-        while ((count = in.read(bytes)) > 0) {
-            out.write(bytes, 0, count);
-            i++;
-            System.out.println("linea "+i+". Cuenta servidor: "+count);
-        }
+            } catch (IOException ex) {
+                System.out.println("No se pudo aceptar conexión: "+ex);
+            }
+            
+            /*Aquí se envía el catálogo al cliente*/
+            
+            //Sending the response back to the client.
+            OutputStream out2 = socket.getOutputStream();
+            File myFile=new File( FILE_TO_RECEIVED );
+            FileInputStream fis=new FileInputStream(myFile);
+            byte [] mybytearray1  = new byte [(int)myFile.length()];
+
+
+            int len ;
+            while ((len = fis.read(mybytearray1)) >= 0) {
+                out.write(len);
+                System.out.println("Message sent to the client is "+ current);
+                out.flush();
+                   //fis.close();
+            }  
+            
+            /*Se termina de enviar el catálogo*/
+            
+            try {
+                in = socket.getInputStream();
+            } catch (IOException ex) {
+                System.out.println("Error con socket In: " +ex);
+            }
+            try {
+                out = new FileOutputStream("src\\objetos\\recieved.json");
+            } catch (FileNotFoundException ex) {
+                System.out.println("File not found. ");
+            }
+             byte[] bytes = new byte[buffer*1024];
+            int count;
+            int i=0;
+            while ((count = in.read(bytes)) > 0) {
+                out.write(bytes, 0, count);
+                i++;
+                System.out.println("linea "+i+". Cuenta servidor: "+count);
+            }
+            
+            System.out.println("Message received from client is "+current);
+                     
+        }        
+        
         out.close();
         in.close();
         socket.close();
