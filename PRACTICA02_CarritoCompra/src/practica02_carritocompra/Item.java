@@ -1,10 +1,10 @@
 package practica02_carritocompra;
 
 public class Item{
-    private String sku = "";
-    private String nombre = "";
-    private int exis = 0;
-    private int precio = 0;
+    String sku = "";
+    String nombre = "";
+    int exis = 0;
+    int precio = 0;
     public Item(String sku, String nombre, int exis, int precio){
         this.sku = sku;
         this.nombre = sku;

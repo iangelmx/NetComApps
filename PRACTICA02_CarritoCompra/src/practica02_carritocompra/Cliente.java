@@ -5,12 +5,61 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
+import practica02_carritocompra.Item;
 
 public class Cliente extends javax.swing.JFrame {
+    
+    public void connectToServer(String host, int puerto, int buffer) throws IOException{
+        Socket socket = null;
+        InputStream in = null;
+        OutputStream out = null;
+
+        socket = new Socket(host, puerto);
+        in = socket.getInputStream();
+ 
+        out = new FileOutputStream("src\\inventario\\inventarioFromS_ToC.json");
+
+        byte[] bytes = new byte[buffer*1024];
+        int count;
+        int i=0;
+        while ((count = in.read(bytes)) > 0) {
+            out.write(bytes, 0, count);
+            i++;
+            System.out.println("linea "+i+". Cuenta de recepción: "+count);
+        }
+        
+        System.out.println("Recibió el archivo.");
+        
+        FileInputStream fstream = new FileInputStream("src\\objetos\\recieved.json");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String line;
+        Item[] items = new Item[10];
+        int a=0;
+        Gson gson = new Gson();
+        while ((line = br.readLine()) != null) {
+           System.out.println("Lee linea");
+           items[a]= gson.fromJson(line,Item.class);
+           System.out.println(line);
+           a+=1;
+        }
+        System.out.println("");
+        for( Item item : items ){
+            modelo.addRow(new Object[] {item.sku, item.nombre, item.exis});
+            //modelo.addRow(new Object[]{"1AF3F30", "Carrito", 5});
+        }
+        
+    }
     
     DefaultTableModel modelo = null;
     public Cliente() {
         initComponents();
+        try{
+            connectToServer("localhost", 3060, 300);
+        }
+        catch(IOException ex){
+            System.out.println("Excepción: "+ex);
+        }
+        
         modelo = (DefaultTableModel) tablaDatos.getModel();
     }
 

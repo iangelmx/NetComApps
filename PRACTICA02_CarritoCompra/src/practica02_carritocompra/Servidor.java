@@ -10,10 +10,26 @@ import java.io.*;
 import java.net.*;
 
 public class Servidor {
+    public static Item[] getInventario () throws IOException{
+        FileInputStream fstream = new FileInputStream("src\\inventario\\inventario.json");
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String line;
+
+        Gson gson= new Gson();
+        Item[] items=new Item[10];
+        int a = 0;
+        while ((line = br.readLine()) != null) {
+           items[a]= gson.fromJson(line,Item.class);
+           System.out.println(line);
+           a+=1;
+        }
+        return items;
+    }
+    
     public static void iniciaServidor(int puerto, int buffer) throws IOException{
         ServerSocket serverSocket = null;
         boolean flag = false;
-        String filePathInventario = "./inventario/invent.json";
+        String filePathInventario = "src\\inventario\\inventario.json";
 
         serverSocket = new ServerSocket(puerto);
         System.out.println("Se ha iniciado el servidor...");
@@ -23,7 +39,9 @@ public class Servidor {
             OutputStream out = null;
             int count;
             if(flag == false){
+                System.out.println("Llegó aquí");
                 socket = serverSocket.accept();
+                System.out.println("Aceptó una conexión");
                 File file=new File( filePathInventario );
 
                 long length = file.length();
@@ -35,32 +53,38 @@ public class Servidor {
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
                 }
+                out.flush();
+                System.out.println("Se supone que lo envió");
                 flag = true;
             }
-            /*Hasta aquí termina la primera parte de envío del catálogo*/
-            
-            /*Aquí hacia abajo viene la parte en que se recibe la respuesta del cliente de compra*/
-            in = socket.getInputStream();
-            out = new FileOutputStream("src\\inventario\\recibidoDeCliente.json");
-            byte[] bytes = new byte[buffer*1024];
-            int i=0;
-            while ((count = in.read(bytes)) > 0) {
-                out.write(bytes, 0, count);
-                //i++;
-                //System.out.println("linea "+i+". Cuenta servidor: "+count);
-            }
-            
-            FileInputStream fstream = new FileInputStream("src\\objetos\\recibidoDeCliente.json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-            String line;
-            
-            Gson gson= new Gson();
-            Item[] items=new Item[200];
-            int a = 0;
-            while ((line = br.readLine()) != null) {
-               items[a]= gson.fromJson(line,Item.class);
-               System.out.println(line);
-               a+=1;
+            else{
+                /*Hasta aquí termina la primera parte de envío del catálogo*/
+
+                /*Aquí hacia abajo viene la parte en que se recibe la respuesta del cliente de compra*/
+                in = socket.getInputStream();
+                out = new FileOutputStream("src\\inventario\\recibidoDeCliente.json");
+                byte[] bytes = new byte[buffer*1024];
+                int i=0;
+                while ((count = in.read(bytes)) > 0) {
+                    out.write(bytes, 0, count);
+                    //i++;
+                    //System.out.println("linea "+i+". Cuenta servidor: "+count);
+                }
+
+                /*FileInputStream fstream = new FileInputStream("src\\objetos\\recibidoDeCliente.json");
+                BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+                String line;
+
+                Gson gson= new Gson();
+                Item[] items=new Item[11];
+                int a = 0;
+                while ((line = br.readLine()) != null) {
+                   items[a]= gson.fromJson(line,Item.class);
+                   System.out.println(line);
+                   a+=1;
+                }*/
+
+                //Item[] inventario = getInventario();
             }
             
             
@@ -70,6 +94,6 @@ public class Servidor {
     
     
     public static void main(String[] args) throws IOException {
-        iniciaServidor(3060, 30);
+        iniciaServidor(3060, 300);
     }
 }
