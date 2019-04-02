@@ -2,145 +2,15 @@ package practica02_carritocompra;
 
 import com.google.gson.Gson;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.*;
+import java.util.*;
 import javax.swing.table.DefaultTableModel;
-import static practica02_carritocompra.Servidor.sendFileToServer;
 
 public class Cliente extends javax.swing.JFrame {
     
-    Socket socket = null;
-    InputStream in = null;
-    OutputStream out = null;
-    
-    public static void iniciaServidor(int puerto, int buffer) throws IOException{
-        
-        Gson gson= new Gson();
-        String serializado = gson.toJson(invent);
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(puerto);
-            System.out.println("Se ha iniciado el servidor...");
-        } catch (IOException ex) {
-            System.out.println("Error: "+ex);
-        }
-
-        Socket socket = null;
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            socket = serverSocket.accept();
-            /*
-            Aquí se crearía el nuevo socket
-            */
-        } catch (IOException ex) {
-            System.out.println("No se pudo aceptar conexión: "+ex);
-        }
-        try {
-            in = socket.getInputStream();
-        } catch (IOException ex) {
-            System.out.println("Error con socket In: " +ex);
-        }
-        try {
-            out = new FileOutputStream("src\\objetos\\recieved.json");
-        } catch (FileNotFoundException ex) {
-            System.out.println("File not found. ");
-        }
-        byte[] bytes = new byte[buffer*1024];
-        int count;
-        int i=0;
-        while ((count = in.read(bytes)) > 0) {
-            out.write(bytes, 0, count);
-            i++;
-            System.out.println("linea "+i+". Cuenta servidor: "+count);
-        }
-        out.close();
-        in.close();
-        socket.close();
-        FileInputStream fstream = new FileInputStream("src\\objetos\\recieved.json");
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-        String line;
-        while ((line = br.readLine()) != null) {
-           per1= gson.fromJson(line,Persona.class);
-           System.out.println(line);
-           System.out.println(per1.toString());
-        }
-        serverSocket.close();
-    }
-    
-    public File writeToFile(String pathFile, String toWrite) throws IOException{
-        File file=new File( pathFile );
-        FileWriter fw = new FileWriter(file);
-        PrintWriter escribir = null;
-        escribir = new PrintWriter(fw);
-        escribir.write(toWrite);
-        escribir.close();
-        return file;
-    }
-    
-    public boolean closeSocket() throws IOException{
-        in.close();
-        socket.close();
-        return true;
-    }
-        
-    public void sendFileToServer(String datos, String host, int puerto, int buffer) throws IOException  {
-        int count;
-        int a = 0;
-        double progresoEnvio = 0;
-
-        try{
-            socket = new Socket(host, puerto);
-        }catch(IOException ex){
-            System.out.println("Conection failed: "+ ex);
-        }
-        
-        File file = writeToFile("src\\objetos\\CtoS.json", datos);
-        
-        long length = file.length();
-        byte[] bytes = new byte[buffer * 1024];
-        try{
-            in = new FileInputStream(file);
-        }catch(FileNotFoundException ex){
-            System.out.println("ERROR 404: "+ ex);
-        }
-        try{
-            out = socket.getOutputStream();
-        }catch(IOException ex){
-            System.out.println("Exception Socket: "+ ex);
-        }
-        
-        long acum = 0;
-        while ((count = in.read(bytes)) > 0) {
-            a++;
-            acum += count;
-            out.write(bytes, 0, count);
-            progresoEnvio = (100 * acum) / length;
-            System.out.println("Progreso: "+progresoEnvio);
-        }
-        out.close();        
-    }
-
-    /**
-     * Creates new form Cliente
-     */
     DefaultTableModel modelo = null;
     public Cliente() {
         initComponents();
-        
-        try {
-            iniciaServidor(3060, 20);
-        } catch (IOException ex) {
-            System.out.println("Error en inicio de cliente: "+ex);
-        }
-        
-        try {
-            sendFileToServer(" ", "localhost", 3060, 20);
-        } catch (IOException ex) {
-            System.out.println("Excepción desde inicio: "+ex);
-        }
         modelo = (DefaultTableModel) tablaDatos.getModel();
     }
 
