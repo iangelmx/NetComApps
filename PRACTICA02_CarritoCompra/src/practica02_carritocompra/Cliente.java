@@ -4,15 +4,32 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import practica02_carritocompra.Item;
 
 public class Cliente extends javax.swing.JFrame {
+    Item [] clonProd = null;
+    Item[] items = null;
+    
+    Socket socket = null;
+    InputStream in = null;
+    OutputStream out = null;
+    
+    public static File writeToFile(String pathFile, String toWrite) throws IOException{
+        File file=new File( pathFile );
+        FileWriter fw = new FileWriter(file);
+        PrintWriter escribir = null;
+        escribir = new PrintWriter(fw);
+        escribir.write(toWrite);
+        escribir.close();
+        return file;
+    }
     
     public void connectToServer(String host, int puerto, int buffer) throws IOException{
-        Socket socket = null;
-        InputStream in = null;
-        OutputStream out = null;
+        
 
         socket = new Socket(host, puerto);
         in = socket.getInputStream();
@@ -30,29 +47,37 @@ public class Cliente extends javax.swing.JFrame {
         
         System.out.println("Recibió el archivo.");
         
-        FileInputStream fstream = new FileInputStream("src\\objetos\\recieved.json");
+        FileInputStream fstream = new FileInputStream("src\\inventario\\inventarioFromS_ToC.json");
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String line;
-        Item[] items = new Item[10];
+        
         int a=0;
         Gson gson = new Gson();
         while ((line = br.readLine()) != null) {
-           System.out.println("Lee linea");
-           items[a]= gson.fromJson(line,Item.class);
+           System.out.println("Lee linea: "+line);
+           items = gson.fromJson(line,Item[].class);
            System.out.println(line);
            a+=1;
         }
         System.out.println("");
-        for( Item item : items ){
-            modelo.addRow(new Object[] {item.sku, item.nombre, item.exis});
+        for( Item producto : items ){
+            System.out.println(producto.nombre);
+            modelo.addRow(new Object[] {producto.sku, producto.nombre, producto.exis});
             //modelo.addRow(new Object[]{"1AF3F30", "Carrito", 5});
         }
+        clonProd = items;
         
+        for(int b=0; b < clonProd.length; b++){
+            clonProd[b].exis = 0;
+        }
     }
     
     DefaultTableModel modelo = null;
+    DefaultTableModel carritoTable = null;
     public Cliente() {
         initComponents();
+        modelo = (DefaultTableModel) tablaDatos.getModel();
+        carritoTable = (DefaultTableModel) carrito.getModel();
         try{
             connectToServer("localhost", 3060, 300);
         }
@@ -60,7 +85,7 @@ public class Cliente extends javax.swing.JFrame {
             System.out.println("Excepción: "+ex);
         }
         
-        modelo = (DefaultTableModel) tablaDatos.getModel();
+        
     }
 
     /**
@@ -77,6 +102,10 @@ public class Cliente extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaDatos = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        carrito = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -112,10 +141,50 @@ public class Cliente extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(tablaDatos);
 
-        jButton1.setText("Ejemplo");
+        jButton1.setText("Agregar a carrito");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Comprar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        carrito.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        carrito.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "SKU", "Nombre", "Existencias"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(carrito);
+
+        jButton3.setText("Restar de carrito");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -126,14 +195,20 @@ public class Cliente extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
                             .addComponent(jButton1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton3)
+                            .addGap(108, 108, 108)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel2)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 5, Short.MAX_VALUE)))
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 415, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(0, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -146,18 +221,92 @@ public class Cliente extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addContainerGap(89, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        
+        /* De los items sumar o restar */
+        int rowSelected = tablaDatos.getSelectedRow();
+        clonProd[ rowSelected ].exis++;
 
-        modelo.addRow(new Object[]{"1AF3F30", "Carrito", 5});
+        carritoTable.setRowCount(0);
+        
+        for( Item producto : clonProd ){
+            //System.out.println(producto.toString());
+            if(producto.exis > 0){
+                carritoTable.addRow(new Object[] {producto.sku, producto.nombre, producto.exis});
+            }
+        }
+        
+        
+        //carritoTable.addRow(new Object[] {clonProd[rowSelected].sku, clonProd[rowSelected].nombre, clonProd[rowSelected].exis});
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        int rowSelected = carrito.getSelectedRow();
+        String skuToDel = carritoTable.getValueAt(rowSelected, 0).toString();
+        for(int a = 0; a<clonProd.length; a++){
+            if( clonProd[a].sku.equals(skuToDel) && clonProd[ a ].exis >= 1){
+                clonProd[ a ].exis--;
+            }
+        }
+        
+        carritoTable.setRowCount(0);
+        
+        for( Item producto : clonProd ){
+            System.out.println(producto.toString());
+            if(producto.exis > 0){
+                carritoTable.addRow(new Object[] {producto.sku, producto.nombre, producto.exis});
+            }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        boolean flag = true;
+        for(int a=0; a<clonProd.length; a++){
+            if( items[a].exis > clonProd[a].exis ){
+                JOptionPane.showMessageDialog( null, "Ooops!\nNo hay suficiente en inventario para: "+String.valueOf(clonProd[a].exis)+" "+clonProd[a].nombre, "Error de compra", JOptionPane.ERROR_MESSAGE);
+                flag = false;
+            }
+        }
+        
+        int count=0;
+        
+        if(flag == true){
+            Gson gson = new Gson();
+            String jsonShipping = gson.toJson(clonProd);
+            try {
+                File archivo = writeToFile("src\\inventario\\shippingList.json", jsonShipping);
+                long length = archivo.length();
+                byte[] bytes = new byte[200 * 1024];
+
+                in = new FileInputStream(archivo);
+                out = socket.getOutputStream();
+                
+                while ((count = in.read(bytes)) > 0) {
+                    out.write(bytes, 0, count);
+                }
+                out.flush();
+            }catch (Exception ex) {
+                System.out.println("Excepción encontrada!: "+ex);
+            }
+        }
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -195,10 +344,14 @@ public class Cliente extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable carrito;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable tablaDatos;
     // End of variables declaration//GEN-END:variables
 }
