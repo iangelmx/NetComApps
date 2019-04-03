@@ -30,14 +30,14 @@ public class Cliente extends javax.swing.JFrame {
         
         System.out.println("Recibió el archivo.");
         
-        FileInputStream fstream = new FileInputStream("src\\objetos\\recieved.json");
+        FileInputStream fstream = new FileInputStream("src\\inventario\\inventarioFromS_ToC.json");
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String line;
         Item[] items = new Item[10];
         int a=0;
         Gson gson = new Gson();
         while ((line = br.readLine()) != null) {
-           System.out.println("Lee linea");
+           System.out.println("Lee linea: "+line);
            items[a]= gson.fromJson(line,Item.class);
            System.out.println(line);
            a+=1;

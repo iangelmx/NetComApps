@@ -7,7 +7,7 @@ public class Item{
     int precio = 0;
     public Item(String sku, String nombre, int exis, int precio){
         this.sku = sku;
-        this.nombre = sku;
+        this.nombre = nombre;
         this.exis = exis;
         this.precio = precio;
     }

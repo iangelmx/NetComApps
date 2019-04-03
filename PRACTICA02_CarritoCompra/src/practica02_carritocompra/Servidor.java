@@ -29,6 +29,12 @@ public class Servidor {
     public static void iniciaServidor(int puerto, int buffer) throws IOException{
         ServerSocket serverSocket = null;
         boolean flag = false;
+        Item[] items = { new Item("1ASDF", "Hot Wheels", 3, 10), new Item("2ASDF", "Tomates", 4, 32) };
+        
+        Gson json = new Gson();
+        String jsonStr = json.toJson(items);
+        System.out.println(jsonStr);
+        
         String filePathInventario = "src\\inventario\\inventario.json";
 
         serverSocket = new ServerSocket(puerto);
@@ -56,19 +62,29 @@ public class Servidor {
                 out.flush();
                 System.out.println("Se supone que lo envió");
                 flag = true;
+                out.close();
             }
             else{
+                try{
+                System.out.println("Entró al else...");
                 /*Hasta aquí termina la primera parte de envío del catálogo*/
 
                 /*Aquí hacia abajo viene la parte en que se recibe la respuesta del cliente de compra*/
                 in = socket.getInputStream();
+                System.out.println("Trató de obtener un dato de entrada");
                 out = new FileOutputStream("src\\inventario\\recibidoDeCliente.json");
                 byte[] bytes = new byte[buffer*1024];
                 int i=0;
+                System.out.println("Esperará archivo");
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
-                    //i++;
-                    //System.out.println("linea "+i+". Cuenta servidor: "+count);
+                    i++;
+                    System.out.println("linea "+i+". Cuenta servidor: "+count);
+                }
+                System.out.println("Salió del while");
+                }
+                catch(Exception ex){
+                    System.out.println("Excepción Else Servidor: "+ex);
                 }
 
                 /*FileInputStream fstream = new FileInputStream("src\\objetos\\recibidoDeCliente.json");
