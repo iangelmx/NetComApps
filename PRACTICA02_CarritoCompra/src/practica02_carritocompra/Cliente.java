@@ -306,11 +306,11 @@ public class Cliente extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         
-        try {
+        /*try {
             socket= new Socket("localhost",3060);
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
         InputStream in = null;
         OutputStream out = null;
         // TODO add your handling code here:
@@ -402,6 +402,8 @@ public class Cliente extends javax.swing.JFrame {
                     out.write(bytes, 0, count);
                 }
                 socket.close();
+                JOptionPane.showMessageDialog( null, "Compra exitosa!!", "Compra finalizada", JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
                 //out.flush();
             }catch (Exception ex) {
                 System.out.println("Excepción encontrada!: "+ex);
