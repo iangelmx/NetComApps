@@ -14,14 +14,17 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 
 public class Cliente extends javax.swing.JFrame {
     Item [] clonProd = null;
-    Item[] items = null;
+    Item [] items = null;
     
     Socket socket = null;
+    String hostToConnect = "";
    
     
     public static File writeToFile(String pathFile, String toWrite) throws IOException{
@@ -85,18 +88,28 @@ public class Cliente extends javax.swing.JFrame {
            System.out.println(line);
            a+=1;
         }
-        socket.close();
+        
+        
+        
         System.out.println("");
         for( Item producto : items ){
-            System.out.println(producto.nombre);
+            //System.out.println(producto.nombre);
             modelo.addRow(new Object[] {producto.sku, producto.nombre, producto.exis});
             //modelo.addRow(new Object[]{"1AF3F30", "Carrito", 5});
         }
-        clonProd = items;
         
+        
+        
+        clonProd = items;
+        //System.out.println("Antes de for"+items[0].toString());
         for(int b=0; b < clonProd.length; b++){
             clonProd[b].exis = 0;
+            /*System.out.println("clon inicial"+clonProd[b].toString());
+            System.out.println("items inicial"+items[b].toString());*/
         }
+        //System.out.println("Después de for"+items[0].toString());
+        
+        socket.close();
         
     }
     
@@ -108,8 +121,8 @@ public class Cliente extends javax.swing.JFrame {
         modelo = (DefaultTableModel) tablaDatos.getModel();
         carritoTable = (DefaultTableModel) carrito.getModel();
         try{
-            String server = JOptionPane.showInputDialog("¿A dónde te quieres conectar?");
-            connectToServer(server, 3060, 300);
+            hostToConnect = JOptionPane.showInputDialog("¿A dónde te quieres conectar?");
+            connectToServer(hostToConnect, 3060, 300);
         }
         catch(IOException ex){
             System.out.println("Excepción: "+ex);
@@ -268,6 +281,9 @@ public class Cliente extends javax.swing.JFrame {
         /* De los items sumar o restar */
         int rowSelected = tablaDatos.getSelectedRow();
         clonProd[ rowSelected ].exis++;
+        
+        /*System.out.println("Add items: "+items[rowSelected].toString() );
+        System.out.println("Add clon: "+clonProd[rowSelected].toString() );*/
 
         carritoTable.setRowCount(0);
         
@@ -305,18 +321,44 @@ public class Cliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        
-        /*try {
-            socket= new Socket("localhost",3060);
+        boolean flag = true;
+        try {
+            socket= new Socket(hostToConnect,3060);
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
         InputStream in = null;
         OutputStream out = null;
+        try{
+            FileInputStream fstream = new FileInputStream("src\\inventario\\inventarioFromS_ToC.json");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+            String line;
+            
+            Item [] original = null;
+            Gson gson = new Gson();
+            while ((line = br.readLine()) != null) {
+               //System.out.println("Lee linea: "+line);
+               original = gson.fromJson(line,Item[].class);
+               System.out.println(line);
+            }
+            
+            for(int a=0; a<clonProd.length; a++){
+                if( original[a].exis < clonProd[a].exis ){
+                    JOptionPane.showMessageDialog( null, "Ooops!\nNo hay suficiente en inventario para: "+String.valueOf(clonProd[a].exis)+" "+clonProd[a].nombre, "Error de compra", JOptionPane.ERROR_MESSAGE);
+                    flag = false;
+                }
+            }
+            
+        }catch(Exception ex){
+            System.out.println("Excepcion 01: "+ex);
+        }
         // TODO add your handling code here:
-        boolean flag = true;
+        
         for(int a=0; a<clonProd.length; a++){
-            if( items[a].exis > clonProd[a].exis ){
+            /*
+            System.out.println("items: "+items[a].toString());
+            System.out.println("clon: "+clonProd[a].toString());*/
+            if( items[a].exis < clonProd[a].exis ){
                 JOptionPane.showMessageDialog( null, "Ooops!\nNo hay suficiente en inventario para: "+String.valueOf(clonProd[a].exis)+" "+clonProd[a].nombre, "Error de compra", JOptionPane.ERROR_MESSAGE);
                 flag = false;
             }
@@ -359,6 +401,7 @@ public class Cliente extends javax.swing.JFrame {
                 
                 double total = 0;
                 for(int a=0; a<clonProd.length; a++){
+                    
                     if( clonProd[a].exis > 0 ){
                         //chunk2.append(clonProd[a].sku+" | "+clonProd[a].nombre+ " | "+String.valueOf(clonProd[a].exis)+"\n");
                         /*salida+=clonProd[a].sku+"\t|\t"+clonProd[a].nombre+ "\t|\t"+String.valueOf(clonProd[a].exis)+"\t|\t"+String.valueOf(clonProd[a].precio)+"\n";*/
@@ -401,15 +444,20 @@ public class Cliente extends javax.swing.JFrame {
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
                 }
-                socket.close();
-                JOptionPane.showMessageDialog( null, "Compra exitosa!!", "Compra finalizada", JOptionPane.INFORMATION_MESSAGE);
-                System.exit(0);
+                
+                
+                
+                
+                
+                JOptionPane.showMessageDialog( null, "Compra exitosa!!\nSu ticket está en: src/salida.pdf", "Compra finalizada", JOptionPane.INFORMATION_MESSAGE);
+                //System.exit(0);
                 //out.flush();
+                socket.close();
             }catch (Exception ex) {
                 System.out.println("Excepción encontrada!: "+ex);
             }
         }
-        
+        System.exit(0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
