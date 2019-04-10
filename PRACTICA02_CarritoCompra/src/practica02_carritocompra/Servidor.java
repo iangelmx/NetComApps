@@ -83,7 +83,7 @@ public class Servidor {
                     }
                     
                     System.out.println("Salió del while");
-                    //setInventario("src\\inventario\\recibidoDeCliente.json");
+                    setInventario("src\\inventario\\recibidoDeCliente.json");
                     flag=false;
                     }
                     catch(Exception ex){
