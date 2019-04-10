@@ -4,11 +4,18 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import practica02_carritocompra.Item;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.stream.Stream;
+
 
 public class Cliente extends javax.swing.JFrame {
     Item [] clonProd = null;
@@ -26,6 +33,25 @@ public class Cliente extends javax.swing.JFrame {
         escribir.write(toWrite);
         escribir.close();
         return file;
+    }
+    
+    private void addTableHeader(PdfPTable table) {
+        //headers.add("SKU \t|\t Producto \t|\t Cantidad \t|\t Precio");
+        Stream.of("SKU", "Producto", "Cantidad", "Precio Unit", "Subtotal")
+          .forEach(columnTitle -> {
+            PdfPCell header = new PdfPCell();
+            header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            header.setBorderWidth(2);
+            header.setPhrase(new Phrase(columnTitle));
+            table.addCell(header);
+        });
+    }
+    private void addRows(PdfPTable table, String[] renglon) {
+        table.addCell(renglon[0]);
+        table.addCell(renglon[1]);
+        table.addCell(renglon[2]);
+        table.addCell(renglon[3]);
+        table.addCell(renglon[4]);
     }
     
     public void connectToServer(String host, int puerto, int buffer) throws IOException{
@@ -289,8 +315,69 @@ public class Cliente extends javax.swing.JFrame {
         int count=0;
         
         if(flag == true){
+            
+            Document document = new Document();
+            try{
+                PdfWriter.getInstance(document, new FileOutputStream("src\\salida.pdf"));
+
+                document.open();
+                Font font = FontFactory.getFont(FontFactory.TIMES_BOLD, 24, BaseColor.BLACK);
+                Chunk chunk = new Chunk("Ticket de compra", font);
+                
+                document.add(chunk);
+                
+                Font font2 = FontFactory.getFont(FontFactory.COURIER, 16, BaseColor.BLACK);
+                String salida = "";
+                
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date date = new Date();
+                String fecha = dateFormat.format(date);
+                
+                PdfPTable table = new PdfPTable(5);
+                addTableHeader(table);
+                
+                /*Paragraph headers = new Paragraph();
+                headers.add("SKU \t|\t Producto \t|\t Cantidad \t|\t Precio");
+                headers.setFont(font2);*/
+                
+                document.add(new Paragraph(""));
+                document.add(new Paragraph("Fecha transacción: "+ fecha+"\n\n"));
+                document.add(new Paragraph(""));
+                //document.add( headers );
+                
+                
+                
+                double total = 0;
+                for(int a=0; a<clonProd.length; a++){
+                    if( clonProd[a].exis > 0 ){
+                        //chunk2.append(clonProd[a].sku+" | "+clonProd[a].nombre+ " | "+String.valueOf(clonProd[a].exis)+"\n");
+                        /*salida+=clonProd[a].sku+"\t|\t"+clonProd[a].nombre+ "\t|\t"+String.valueOf(clonProd[a].exis)+"\t|\t"+String.valueOf(clonProd[a].precio)+"\n";*/
+                        addRows(table, new String[]{clonProd[a].sku, clonProd[a].nombre, String.valueOf(clonProd[a].exis),"$"+String.valueOf(clonProd[a].precio), "$"+String.valueOf((clonProd[a].precio)*clonProd[a].exis) } );
+                        total += (clonProd[a].precio)*clonProd[a].exis;
+                    }
+                }
+                
+                addRows(table, new String[]{"-","-","-","-","-"} );
+                addRows(table, new String[]{"*","*","*","Total a pagar", "$"+String.valueOf(total)} );
+                
+                
+                
+                document.add(table);
+                //salida += "\nTotal a pagar: "+;
+                
+                
+                
+
+                document.add( new Paragraph(salida) );
+                document.close();
+            }
+            catch(Exception ex){
+                System.out.println("Exception PDF:"+ex.toString());
+            }
+            
             Gson gson = new Gson();
             String jsonShipping = gson.toJson(clonProd);
+            
             try {
                 File archivo = writeToFile("src\\inventario\\shippingList.json", jsonShipping);
                 long length = archivo.length();
