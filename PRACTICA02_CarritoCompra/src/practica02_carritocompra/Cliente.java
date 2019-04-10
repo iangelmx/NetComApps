@@ -76,10 +76,12 @@ public class Cliente extends javax.swing.JFrame {
     DefaultTableModel carritoTable = null;
     public Cliente() {
         initComponents();
+        
         modelo = (DefaultTableModel) tablaDatos.getModel();
         carritoTable = (DefaultTableModel) carrito.getModel();
         try{
-            connectToServer("localhost", 3060, 300);
+            String server = JOptionPane.showInputDialog("¿A dónde te quieres conectar?");
+            connectToServer(server, 3060, 300);
         }
         catch(IOException ex){
             System.out.println("Excepción: "+ex);
