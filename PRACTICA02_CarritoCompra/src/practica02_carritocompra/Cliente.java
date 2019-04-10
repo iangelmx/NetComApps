@@ -22,8 +22,7 @@ public class Cliente extends javax.swing.JFrame {
     Item[] items = null;
     
     Socket socket = null;
-    InputStream in = null;
-    OutputStream out = null;
+   
     
     public static File writeToFile(String pathFile, String toWrite) throws IOException{
         File file=new File( pathFile );
@@ -56,7 +55,8 @@ public class Cliente extends javax.swing.JFrame {
     
     public void connectToServer(String host, int puerto, int buffer) throws IOException{
         
-
+        InputStream in = null;
+        OutputStream out = null;
         socket = new Socket(host, puerto);
         in = socket.getInputStream();
  
@@ -85,6 +85,7 @@ public class Cliente extends javax.swing.JFrame {
            System.out.println(line);
            a+=1;
         }
+        socket.close();
         System.out.println("");
         for( Item producto : items ){
             System.out.println(producto.nombre);
@@ -96,6 +97,7 @@ public class Cliente extends javax.swing.JFrame {
         for(int b=0; b < clonProd.length; b++){
             clonProd[b].exis = 0;
         }
+        
     }
     
     DefaultTableModel modelo = null;
@@ -303,6 +305,14 @@ public class Cliente extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        try {
+            socket= new Socket("localhost",3060);
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        InputStream in = null;
+        OutputStream out = null;
         // TODO add your handling code here:
         boolean flag = true;
         for(int a=0; a<clonProd.length; a++){
@@ -379,17 +389,20 @@ public class Cliente extends javax.swing.JFrame {
             String jsonShipping = gson.toJson(clonProd);
             
             try {
-                File archivo = writeToFile("src\\inventario\\shippingList.json", jsonShipping);
+                File archivo = new File("src\\inventario\\shippingList.json");
                 long length = archivo.length();
                 byte[] bytes = new byte[200 * 1024];
-
+                out= new FileOutputStream(archivo);
+                out.write(jsonShipping.getBytes());
+                
                 in = new FileInputStream(archivo);
                 out = socket.getOutputStream();
-                
+                System.out.println("Escribiendo en socket -cliente");
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
                 }
-                out.flush();
+                socket.close();
+                //out.flush();
             }catch (Exception ex) {
                 System.out.println("Excepción encontrada!: "+ex);
             }
