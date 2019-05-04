@@ -444,11 +444,7 @@ public class Cliente extends javax.swing.JFrame {
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
                 }
-                
-                
-                
-                
-                
+              
                 JOptionPane.showMessageDialog( null, "Compra exitosa!!\nSu ticket está en: src/salida.pdf", "Compra finalizada", JOptionPane.INFORMATION_MESSAGE);
                 //System.exit(0);
                 //out.flush();
