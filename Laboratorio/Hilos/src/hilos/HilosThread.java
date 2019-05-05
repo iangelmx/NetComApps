@@ -1,15 +1,12 @@
 package hilos;
 
-public class Hilos {
+public class HilosThread {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         
         long now = System.currentTimeMillis();
-        Alfabeto hilo1 = new Alfabeto(1, now);
-        CuentaNumeros hilo2 = new CuentaNumeros(2, now);
+        AlfabetoThread hilo1 = new AlfabetoThread(1, now);
+        NumerosThread hilo2 = new NumerosThread(2, now);
         
         hilo1.start();
         hilo2.start();

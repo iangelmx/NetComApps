@@ -1,9 +1,9 @@
 package hilos;
 
-public class CuentaNumeros extends Thread{
+public class NumerosThread extends Thread{
     private int idHilo;
     private long timestamp;
-    public CuentaNumeros(int numHilo, long timestamp){
+    public NumerosThread(int numHilo, long timestamp){
         this.idHilo = numHilo;
         this.timestamp = timestamp;
     }

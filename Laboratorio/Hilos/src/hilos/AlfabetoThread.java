@@ -1,12 +1,12 @@
 package hilos;
 
-public class Alfabeto extends Thread{
+public class AlfabetoThread extends Thread{
     
     private String abecedario = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
     private int idHilo;
     private long timestamp;
     
-    public Alfabeto(int numHilo, long timestamp){
+    public AlfabetoThread(int numHilo, long timestamp){
         this.idHilo = numHilo;
         this.timestamp = timestamp;
     }
