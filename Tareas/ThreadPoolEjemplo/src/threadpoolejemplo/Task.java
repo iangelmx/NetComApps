@@ -10,12 +10,12 @@ public class Task implements Runnable{
     private String nombre;
     public Task(String name){
         this.nombre = name;
-        limit = 1000;
+        limit = 50;
     }
     public void run(){
 
         for(int a = 0; a<= this.limit; a++){
-            System.out.printf("Contando: %d\n", a);
+            System.out.printf("El Hilo:"+this.nombre+" va contando: %d\n", a);
         }
         
         System.out.println("Finalizó cuenta...");

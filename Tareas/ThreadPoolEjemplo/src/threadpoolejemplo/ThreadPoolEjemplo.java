@@ -1,21 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package threadpoolejemplo;
 
-/**
- *
- * @author iAngelMx
- */
-public class ThreadPoolEjemplo {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+public class ThreadPoolEjemplo{
+    public static void main (String args[]){
+        System.out.println("Comienza la ejecución de los hilos");
+        ExecutorService ex = Executors.newFixedThreadPool(10);
+        Task t;
+        for(int i = 0;i<200; i++){
+            t = new Task("H_"+i);
+            ex.execute(t);
+        }
+        ex.shutdown();
     }
-    
 }
