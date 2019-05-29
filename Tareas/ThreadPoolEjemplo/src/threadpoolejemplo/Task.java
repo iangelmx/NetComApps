@@ -18,6 +18,6 @@ public class Task implements Runnable{
             System.out.printf("El Hilo:"+this.nombre+" va contando: %d\n", a);
         }
         
-        System.out.println("Finalizó cuenta...");
+        System.out.println("El hilo: "+this.nombre+", Finalizó cuenta...");
     }
 }

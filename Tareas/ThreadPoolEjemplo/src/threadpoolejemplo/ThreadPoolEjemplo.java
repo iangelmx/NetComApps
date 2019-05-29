@@ -9,7 +9,7 @@ public class ThreadPoolEjemplo{
         System.out.println("Comienza la ejecución de los hilos");
         ExecutorService ex = Executors.newFixedThreadPool(10);
         Task t;
-        for(int i = 0;i<200; i++){
+        for(int i = 0;i<20; i++){
             t = new Task("H_"+i);
             ex.execute(t);
         }
