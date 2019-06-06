@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,6 +27,7 @@ public class ServidorHilo extends Thread{
     private Gson json;
     private int buffer;
     ServerSocket serverSocket = null;
+    private boolean flag = false;
     
     public ServidorHilo(Socket socket, int id, int buffer) {
         this.socket = socket;
@@ -37,6 +40,17 @@ public class ServidorHilo extends Thread{
         }
         this.json= new Gson();
         this.buffer = buffer;
+        
+        try {
+            sendInventario();
+        } catch (IOException ex) {
+            System.out.println("Hubo un problema al enviar el inventario");
+        }
+        
+    }
+
+    ServidorHilo(Socket socket, int idSession) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     public void desconnectar() {
@@ -103,31 +117,30 @@ public class ServidorHilo extends Thread{
                     }
     
     }
+    
+    public void sendInventario() throws IOException{
+        int count;
+        byte[] bytes = new byte[this.buffer * 1024];
+        System.out.println(this.json.toJson(getInventario()));
+        inFile = new ByteArrayInputStream(this.json.toJson(getInventario()).getBytes());
+
+
+        outSocket = socket.getOutputStream();
+        while ((count = inFile.read(bytes)) > 0) {
+            outSocket.write(bytes, 0, count);
+        }
+        System.out.println("Se supone que envió inventario");
+        flag=false;
+    }
    
     
     @Override
     public void run(){
         int count;
-        try {
-            boolean flag = false;
+        while(true){
             if( flag == true){
-                byte[] bytes = new byte[this.buffer * 1024];
-                System.out.println(this.json.toJson(getInventario()));
-                inFile = new ByteArrayInputStream(this.json.toJson(getInventario()).getBytes());
-
-
-                outSocket = socket.getOutputStream();
-                while ((count = inFile.read(bytes)) > 0) {
-                    outSocket.write(bytes, 0, count);
-                }
-                //outSocket.flush();
-                socket.close();
-                System.out.println("Se supone que lo envió");
-                flag=true;
-            }else{
                 try{
-                    socket = serverSocket.accept();  
-                    inSocket = socket.getInputStream();
+                    inSocket = this.socket.getInputStream();
                     System.out.println("Trató de obtener un dato de entrada");
                     outFile = new FileOutputStream("src\\inventario\\recibidoDeCliente.json");
                     byte[] bytes = new byte[buffer*1024];
@@ -143,17 +156,12 @@ public class ServidorHilo extends Thread{
                     System.out.println("Salió del while");
                     setInventario("src\\inventario\\recibidoDeCliente.json");
                     flag=false;
-                    }
-                    catch(Exception ex){
-                        //System.out.println("Excepción Else Servidor: "+ex);
-                    }
+                }
+                catch(Exception ex){
+                    System.out.println("Excepción en Servidor: "+ex);
+                }
             }
-            
-            
-        } catch (IOException ex) {
-            System.out.println("Hubo una excepción en run(): "+ex);
         }
-        desconnectar();
     }
     
 }
