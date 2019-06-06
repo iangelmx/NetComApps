@@ -72,7 +72,9 @@ public class Cliente extends javax.swing.JFrame {
             out.write(bytes, 0, count);
             i++;
             System.out.println("linea "+i+". Cuenta de recepción: "+count);
+            System.out.println("...?");
         }
+        
         
         System.out.println("Recibió el archivo.");
         
@@ -109,7 +111,7 @@ public class Cliente extends javax.swing.JFrame {
         }
         //System.out.println("Después de for"+items[0].toString());
         
-        socket.close();
+        //socket.close(); ///<- ESTABA DESCOMENTADO ANGEL<<<
         
     }
     
@@ -444,16 +446,18 @@ public class Cliente extends javax.swing.JFrame {
                 while ((count = in.read(bytes)) > 0) {
                     out.write(bytes, 0, count);
                 }
+                out.close();
+                //in.close();
               
                 JOptionPane.showMessageDialog( null, "Compra exitosa!!\nSu ticket está en: src/salida.pdf", "Compra finalizada", JOptionPane.INFORMATION_MESSAGE);
                 //System.exit(0);
                 //out.flush();
-                socket.close();
+                //socket.close();
             }catch (Exception ex) {
                 System.out.println("Excepción encontrada!: "+ex);
             }
         }
-        System.exit(0);
+        //System.exit(0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**

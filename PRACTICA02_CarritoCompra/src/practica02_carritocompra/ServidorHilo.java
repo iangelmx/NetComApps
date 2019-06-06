@@ -130,7 +130,9 @@ public class ServidorHilo extends Thread{
             outSocket.write(bytes, 0, count);
         }
         System.out.println("Se supone que envió inventario");
-        flag=false;
+        outSocket.close();
+        //inFile.reset();
+        flag=true;
     }
    
     
@@ -138,6 +140,12 @@ public class ServidorHilo extends Thread{
     public void run(){
         int count;
         while(true){
+            System.out.println("Está en whileTrue");
+            try{
+                Thread.sleep(3000);
+            }catch(Exception ex){
+                System.out.println("Excepción del sleep");
+            }
             if( flag == true){
                 try{
                     inSocket = this.socket.getInputStream();
